@@ -143,6 +143,20 @@ impl SnSysRegisters {
     /// pas identifie ; mais le firmware n'a qu'un seul chemin de reprise apres
     /// veille profonde, celui de `0x00005CDA`, et il y recalcule la date depuis
     /// le compteur. Rien n'y est fausse.
+    /// Bit 0 de `0x45000300` : demande de mise hors tension du coeur, posee par
+    /// la boucle de veille profonde juste avant son `WFI`, quelle que soit
+    /// l'adresse ou l'edition l'a placee.
+    pub fn hors_tension_demandee(&self) -> bool {
+        self.regs.get(&0x300).copied().unwrap_or(0) & 1 != 0
+    }
+
+    /// Le coeur est rallume : la demande de mise hors tension retombe.
+    pub fn quitter_hors_tension(&mut self) {
+        if let Some(v) = self.regs.get_mut(&0x300) {
+            *v &= !1;
+        }
+    }
+
     pub fn declencher_reveil(&mut self) {
         // Le firmware exige d'abord, en `0x00005CAC`, que le compteur ait
         // depasse le comparateur. Un reveil par bouton arrive avant l'echeance

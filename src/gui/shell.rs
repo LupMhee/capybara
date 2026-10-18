@@ -124,6 +124,8 @@ impl ShellColor {
             Edition::Water => ShellColor::BlueWater,
             Edition::Sky => ShellColor::PurpleSky,
             Edition::JadeForest => ShellColor::JadeForest,
+            Edition::Glacier => ShellColor::WhiteGlacier,
+            Edition::Tropical => ShellColor::OrangeTropics,
             Edition::Earth => ShellColor::JadeForest,
             Edition::Inconnue => ShellColor::BlueWater,
         }

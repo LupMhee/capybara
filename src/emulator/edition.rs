@@ -17,6 +17,8 @@ pub enum Edition {
     Sky,
     Land,
     JadeForest,
+    Glacier,
+    Tropical,
     /// Nom de fichier muet, ou dump d'une autre provenance.
     #[default]
     Inconnue,
@@ -39,6 +41,8 @@ impl Edition {
             ("earth", Edition::Earth),
             ("sky", Edition::Sky),
             ("land", Edition::Land),
+            ("glacier", Edition::Glacier),
+            ("tropic", Edition::Tropical),
         ] {
             if nom.contains(motif) {
                 return edition;
@@ -54,6 +58,8 @@ impl Edition {
             Edition::Sky => "Sky",
             Edition::Land => "Land",
             Edition::JadeForest => "Jade Forest",
+            Edition::Glacier => "White Glacier",
+            Edition::Tropical => "Orange Tropics",
             Edition::Inconnue => "edition inconnue",
         }
     }

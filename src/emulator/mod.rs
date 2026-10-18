@@ -244,6 +244,7 @@ impl Machine {
         if !self.en_veille_profonde() {
             return false;
         }
+        self.periph.snsys.quitter_hors_tension();
         self.reset();
         self.is_running = true;
         true
@@ -479,11 +480,17 @@ impl Machine {
     /// active sans arret : c'est le bourdonnement de quarante secondes en tete
     /// des sons de Jade Forest.
     ///
+    /// White Glacier et Orange Tropics eloignent le meme bloc de `0xE4`.
+    /// Le drapeau y est en `0x18014368`, et la base des voix en `0x1801C904`.
+    /// L'adresse de Water tombe alors dans une zone restee a zero : le
+    /// drapeau ne se levait jamais, et la console restait muette.
+    ///
     /// L'edition se reconnait au nom du fichier, comme la coque : rien dans
     /// l'image ne la nomme. Une edition inconnue garde l'adresse de Water.
     pub fn decalage_son(edition: Edition) -> u32 {
         match edition {
             Edition::JadeForest => 8,
+            Edition::Glacier | Edition::Tropical => 0xE4,
             _ => 0,
         }
     }
@@ -699,7 +706,9 @@ impl Machine {
 
     /// Vrai quand le coeur est gare dans cette boucle.
     pub fn en_veille_profonde(&self) -> bool {
-        self.periph.pmu.deep_sleep_active || Self::VEILLE_PROFONDE.contains(&self.cpu.regs.pc)
+        self.periph.pmu.deep_sleep_active
+            || self.periph.snsys.hors_tension_demandee()
+            || Self::VEILLE_PROFONDE.contains(&self.cpu.regs.pc)
     }
 
     /// Reveille le coeur par une entree utilisateur et indique si un reveil a
@@ -715,6 +724,7 @@ impl Machine {
         // serait maintenant faux sur les editions garees hors de la boucle
         // historique.
         self.periph.snsys.reveil_demande = false;
+        self.periph.snsys.quitter_hors_tension();
         self.reset();
         self.is_running = true;
         true
